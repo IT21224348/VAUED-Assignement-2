@@ -1,0 +1,15 @@
+# rest_service_project/prometheus.yml
+global:
+  scrape_interval: 15s # By default, scrape targets every 15 seconds.
+
+scrape_configs:
+  - job_name: "rest_service"
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+      - targets: ["rest_service:5000"] # 'rest_service' is the service name in docker-compose
+
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
