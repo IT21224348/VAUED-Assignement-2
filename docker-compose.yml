@@ -1,0 +1,52 @@
+# rest_service_project/docker-compose.yml
+version: "3.8"
+
+services:
+  rest_service:
+    build: .
+    container_name: rest_service_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./src:/app/src  # Live code updates
+    networks:
+      - app_network
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus_server
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - app_network
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: grafana_dashboard
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana_provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana_provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - app_network
+
+
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  grafana_data: {}
